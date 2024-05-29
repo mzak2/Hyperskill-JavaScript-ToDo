@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>To-Do List</title>
+    <link rel="stylesheet" href="stylesheet.css">
+    <style>
+    </style>
+</head>
+<body>
+<h1>To-Do List</h1>
+<input id="input-task">
+<button onclick="addToDo()" type="button" id="add-task-button">ADD TASK</button>
+<div>
+    <ul id="task-list">
+    </ul>
+</div>
+<script>
+    // Load tasks from localStorage
+    let taskList = JSON.parse(localStorage.getItem("tasks")) || [];
+
+    // Function to render tasks from the taskList array
+    function displayTasks() {
+        const task_list = document.getElementById("task-list");
+        task_list.innerHTML = "";
+        taskList.forEach((task, index) => {
+            let last_node = document.createElement("li");
+
+            let span = document.createElement("span");
+            span.className = "task";
+            if (task.done) {
+                span.style.textDecorationLine = "line-through";
+            }
+
+            let checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.checked = task.done;
+            checkbox.onclick = function () {
+                doneTask(this, index);
+            };
+
+            let del_button = document.createElement("button");
+            del_button.className = "delete-btn";
+            del_button.innerText = "X";
+            del_button.onclick = function () {
+                removeTask(index);
+            };
+
+            span.append(task.text);
+            last_node.append(checkbox, span, del_button);
+            task_list.append(last_node);
+        });
+    }
+
+    function addToDo() {
+        let input_task = document.getElementById("input-task").value;
+        if (input_task !== "") {
+            taskList.push({ text: input_task, done: false });
+            localStorage.setItem("tasks", JSON.stringify(taskList));
+            displayTasks();
+            document.getElementById("input-task").value = "";
+        }
+    }
+
+    function removeTask(index) {
+        taskList.splice(index, 1);
+        localStorage.setItem("tasks", JSON.stringify(taskList));
+        displayTasks();
+    }
+
+    function doneTask(checkbox, index) {
+        taskList[index].done = checkbox.checked;
+        localStorage.setItem("tasks", JSON.stringify(taskList));
+        displayTasks();
+    }
+
+    // Initial render
+    displayTasks();
+</script>
+</body>
+</html>
